@@ -7,12 +7,15 @@ import {
     Logger,
 } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
+import { DiscordService } from 'src/utils/discord.service'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
     private readonly logger = new Logger(HttpExceptionFilter.name);
 
-    catch(exception: unknown, host: ArgumentsHost): void {
+    constructor(private readonly discordService: DiscordService) {}
+
+    async catch(exception: unknown, host: ArgumentsHost): Promise<void> {
         const ctx = host.switchToHttp();
         const request = ctx.getRequest<FastifyRequest>();
         const response = ctx.getResponse<FastifyReply>();
@@ -56,6 +59,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
             stack: exception instanceof Error ? exception.stack : undefined,
         }),
         };
+
+        await this.discordService.createEmbed(
+            request.method,
+            request.url,
+            status,
+            request.body,
+            message,
+        )
 
         // Log da requisição que causou erro
         this.logger.error(

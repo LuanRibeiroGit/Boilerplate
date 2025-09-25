@@ -21,7 +21,7 @@ import axios from 'axios'
             }
         }
 
-        async createEmbed(method: string, url: string, status: number){
+        async createEmbed(method: string, url: string, status: number, body: any, message: any){
             const embed = {
                 title: '📡 Nova requisição recebida',
                 color: status >= 200 && status < 300 ? 0x00ff00 : 0xff0000,
@@ -29,7 +29,20 @@ import axios from 'axios'
                     { name: 'Método', value: method, inline: true },
                     { name: 'URL', value: url, inline: true },
                     { name: 'Status', value: status.toString(), inline: true },
-                ],
+                    ...(body?.email ? [{name: '📧 email:', value: body.email, inline: true}] : []),
+                    ...(body?.name ? [{name: '🧑 nome', value: body.name, inline: true}] : []),
+                    ...(body?.password ? [{name: '🔒 password', value: '******', inline: false}] : []),
+                    ...(body?.phone ? [{name: 'phone', value: body.phone, inline: true}] : []),
+                    ...(message
+                        ? message.length > 1
+                            ? message.map((m, i) => ({ name: `Return: ${i + 1}`, value: m.toString(), inline: false }))
+                            : [{ name: 'Returno:', value: message.toString(), inline: false }]
+                        : []),
+                    ],
+                    footer: {
+                        text: '💬 Vamos ficar ricos até o final do ano.',
+                        icon_url: 'https://i.imgur.com/AfFp7pu.png'
+                    },
                 timestamp: new Date().toISOString(),
             }
             
