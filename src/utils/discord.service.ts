@@ -4,16 +4,22 @@ import axios from 'axios'
 @Injectable()
     export class DiscordService {
         private readonly logger = new Logger(DiscordService.name)
-        private readonly webhookUrl = process.env.DISCORD_WEBHOOK_URL
+        private readonly webhookUrl = {
+            '/barber/register': process.env.DISCORD_WEBHOOK_BARBER_REGISTER,
+            outhers: process.env.DISCORD_WEBHOOK_OUTHERS_UTILS
+            
+            // DISCORD_WEBHOOK_CLIENT_REGISTER,
+            // DISCORD_WEBHOOK_SHARED_LOGIN,
+        }
 
-        async sendEmbed(embed: any){
+        async sendEmbed(embed: any, url: string){
             if (!this.webhookUrl) {
                 this.logger.error('Webhook do Discord não configurado.')
                 return
             }
-
+            console.log(this.webhookUrl[url])
             try {
-                await axios.post(this.webhookUrl, {
+                await axios.post(this.webhookUrl[url] || this.webhookUrl.outhers, {
                     embeds: [embed],
                 })
             } catch (err) {
@@ -29,14 +35,14 @@ import axios from 'axios'
                     { name: 'Método', value: method, inline: true },
                     { name: 'URL', value: url, inline: true },
                     { name: 'Status', value: status.toString(), inline: true },
-                    ...(body?.email ? [{name: '📧 email:', value: body.email, inline: true}] : []),
-                    ...(body?.name ? [{name: '🧑 nome', value: body.name, inline: true}] : []),
-                    ...(body?.password ? [{name: '🔒 password', value: '******', inline: false}] : []),
-                    ...(body?.phone ? [{name: 'phone', value: body.phone, inline: true}] : []),
+                    ...(body?.email ? [{name: '**📧 email:**', value: ("```"+ body.email +"```"), inline: true}] : []),
+                    ...(body?.password ? [{name: '**🔒 password:**', value: ("```"+ '******' +"```"), inline: false}] : []),
+                    ...(body?.name ? [{name: '**🧑 nome:**', value: ("```"+ body.name +"```"), inline: false}] : []),
+                    ...(body?.phone ? [{name: '**phone:**', value: ("```"+ body.phone +"```"), inline: true}] : []),
                     ...(message
                         ? message.length > 1
-                            ? message.map((m, i) => ({ name: `Return: ${i + 1}`, value: m.toString(), inline: false }))
-                            : [{ name: 'Returno:', value: message.toString(), inline: false }]
+                            ? message.map((m, i) => ({ name: `Retorno: ${i + 1}`, value: m.toString(), inline: false }))
+                            : [{ name: 'Retorno:', value: message.toString(), inline: false }]
                         : []),
                     ],
                     footer: {
@@ -46,6 +52,6 @@ import axios from 'axios'
                 timestamp: new Date().toISOString(),
             }
             
-            await this.sendEmbed(embed)
+            await this.sendEmbed(embed, url)
         }
     }

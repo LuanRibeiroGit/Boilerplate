@@ -7,7 +7,7 @@ import { UpdateBarberDto } from './dto/update-barber.dto';
 export class BarberController {
   constructor(private readonly barberService: BarberService) {}
 
-  @Post()
+  @Post('register')
   create(@Body() createBarberDto: CreateBarberDto) {
     return this.barberService.create(createBarberDto);
   }
