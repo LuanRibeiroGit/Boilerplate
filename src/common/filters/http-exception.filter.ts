@@ -7,7 +7,7 @@ import {
     Logger,
 } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { DiscordService } from 'src/utils/discord.service'
+import { DiscordService } from 'src/common/interceptors/discord/discord.service'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

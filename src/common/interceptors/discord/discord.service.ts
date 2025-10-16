@@ -5,7 +5,7 @@ import axios from 'axios'
     export class DiscordService {
         private readonly logger = new Logger(DiscordService.name)
         private readonly webhookUrl = {
-            '/barber/register': process.env.DISCORD_WEBHOOK_BARBER_REGISTER,
+            '/users/register': process.env.DISCORD_WEBHOOK_BARBER_REGISTER,
             outhers: process.env.DISCORD_WEBHOOK_OUTHERS_UTILS
             
             // DISCORD_WEBHOOK_CLIENT_REGISTER,
@@ -37,7 +37,7 @@ import axios from 'axios'
                     { name: 'Status', value: status.toString(), inline: true },
                     ...(body?.email ? [{name: '**📧 email:**', value: ("```"+ body.email +"```"), inline: true}] : []),
                     ...(body?.password ? [{name: '**🔒 password:**', value: ("```"+ '******' +"```"), inline: false}] : []),
-                    ...(body?.name ? [{name: '**🧑 nome:**', value: ("```"+ body.name +"```"), inline: false}] : []),
+                    ...(body?.name ? [{name: '**🧑 name:**', value: ("```"+ body.name +"```"), inline: false}] : []),
                     ...(body?.phone ? [{name: '**phone:**', value: ("```"+ body.phone +"```"), inline: true}] : []),
                     ...(message
                         ? message.length > 1
