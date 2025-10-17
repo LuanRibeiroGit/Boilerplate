@@ -12,14 +12,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 @Module({
   imports: [
       UserModule,
-      ConfigModule.forRoot({ isGlobal: true }),
-      MongooseModule.forRootAsync({
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        useFactory: async (config: ConfigService) => ({
-          uri: config.get<string>('MONGODB_URI'),
-        }),
-      }),
+      MongooseModule.forRoot(''),
     ],
   controllers: [AppController],
   providers: [
