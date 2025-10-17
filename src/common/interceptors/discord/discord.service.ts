@@ -17,6 +17,7 @@ import axios from 'axios'
                 this.logger.error('Webhook do Discord não configurado.')
                 return
             }
+            console.log(this.webhookUrl[url])
             try {
                 await axios.post(this.webhookUrl[url] || this.webhookUrl.outhers, {
                     embeds: [embed],
@@ -27,7 +28,10 @@ import axios from 'axios'
         }
 
         async createEmbed(method: string, url: string, status: number, body: any, message: any){
+<<<<<<< HEAD
             const messages = Array.isArray(message) ? message : [message];
+=======
+>>>>>>> bbbe176 (MongoDB)
             const embed = {
                 title: '📡 Nova requisição recebida',
                 color: status >= 200 && status < 300 ? 0x00ff00 : 0xff0000,
@@ -39,10 +43,17 @@ import axios from 'axios'
                     ...(body?.password ? [{name: '**🔒 password:**', value: ("```"+ '******' +"```"), inline: false}] : []),
                     ...(body?.name ? [{name: '**🧑 name:**', value: ("```"+ body.name +"```"), inline: false}] : []),
                     ...(body?.phone ? [{name: '**phone:**', value: ("```"+ body.phone +"```"), inline: true}] : []),
+<<<<<<< HEAD
                     ...(messages
                         ? messages.length > 1
                             ? messages.map((m, i) => ({ name: `Retorno: ${i + 1}`, value: m.toString(), inline: false }))
                             : [{ name: 'Retorno:', value: "```" + messages.toString() +"```", inline: false }]
+=======
+                    ...(message
+                        ? message.length > 1
+                            ? message.map((m, i) => ({ name: `Retorno: ${i + 1}`, value: m.toString(), inline: false }))
+                            : [{ name: 'Retorno:', value: message.toString(), inline: false }]
+>>>>>>> bbbe176 (MongoDB)
                         : []),
                     ],
                     footer: {
