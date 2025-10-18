@@ -45,20 +45,16 @@ export class UserService {
     }
 
     async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-        try {
-            const updatedUser = await this.userModel.findByIdAndUpdate(
-                id,
-                updateUserDto,
-                { new: true }
-            ).exec()
-            if (!updatedUser) {
-                throw new NotFoundException(`User with ID "${id}" not found`)
-            }
-            
-            return updatedUser
-        } catch (err) {
-            throw new BadRequestException(err.response.message || 'Failed to update user')
+        const updatedUser = await this.userModel.findByIdAndUpdate(
+            id,
+            updateUserDto,
+            { new: true }
+        ).exec()
+        if (!updatedUser) {
+            throw new NotFoundException(`User with ID "${id}" not found`)
         }
+        
+        return updatedUser
     }
 
     async remove(id: string): Promise<void>{
