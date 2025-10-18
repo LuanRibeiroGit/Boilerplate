@@ -17,7 +17,6 @@ import axios from 'axios'
                 this.logger.error('Webhook do Discord não configurado.')
                 return
             }
-            console.log(this.webhookUrl[url])
             try {
                 await axios.post(this.webhookUrl[url] || this.webhookUrl.outhers, {
                     embeds: [embed],

@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common'
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose'
 import { CreateUserDto } from './dto/create-users.dto'
 import { UpdateUserDto } from './dto/update-users.dto'
-import { Model } from 'mongoose';
+import { Model } from 'mongoose'
 import { User, UserDocument } from './schema/users.schema'
 
 
@@ -13,32 +13,32 @@ export class UserService {
     async create(data: CreateUserDto): Promise<User> {
         try {
             if(data.password !== data.confirmPassword) throw new BadRequestException('Passwords do not match')
-            const user = new this.userModel(data).save();
+            const user = new this.userModel(data).save()
             return await user
         } catch (err) {
             if (err.code === 11000) {
-                throw new ConflictException(`The email '${data.email}' is already in use`);
+                throw new ConflictException(`The email '${data.email}' is already in use`)
             }
-            throw err;
+            throw err
         }
     }
 
     async findAll(): Promise<User[]> {
-        return await this.userModel.find().exec();
+        return await this.userModel.find().exec()
     }
 
     async findById(_id: string): Promise<User> {
-        const user = await this.userModel.findById(_id).exec();
+        const user = await this.userModel.findById(_id).exec()
         if (!user) {
-            throw new NotFoundException(`Failed to get user by id ${_id}`);
+            throw new NotFoundException(`Failed to get user by id ${_id}`)
         }
-        return user;
+        return user
     }
 
     async findByEmail(email: string): Promise<User | null> {
         const user = await this.userModel.findOne({ email }).exec()
         if (!user) {
-            throw new BadRequestException(`Failed to get user with email ${email}`);
+            throw new BadRequestException(`Failed to get user with email ${email}`)
         }
         return user
         
@@ -50,13 +50,14 @@ export class UserService {
                 id,
                 updateUserDto,
                 { new: true }
-            ).exec();
+            ).exec()
             if (!updatedUser) {
-                throw new NotFoundException(`User with ID "${id}" not found`);
+                throw new NotFoundException(`User with ID "${id}" not found`)
             }
-            return updatedUser;
+            
+            return updatedUser
         } catch (err) {
-            throw new BadRequestException(err.response.message || 'Failed to update user');
+            throw new BadRequestException(err.response.message || 'Failed to update user')
         }
     }
 
