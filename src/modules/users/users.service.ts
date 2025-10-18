@@ -13,23 +13,18 @@ export class UserService {
     async create(data: CreateUserDto): Promise<User> {
         try {
             if(data.password !== data.confirmPassword) throw new BadRequestException('Passwords do not match')
-            
-            const user = new this.userModel(data);
-            return await user.save();
+            const user = new this.userModel(data).save();
+            return await user
         } catch (err) {
             if (err.code === 11000) {
-                throw new ConflictException(`O email '${data.email}' já está em uso.`);
+                throw new ConflictException(`The email '${data.email}' is already in use`);
             }
             throw err;
         }
     }
 
     async findAll(): Promise<User[]> {
-        try {
-            return await this.userModel.find().exec();
-        } catch (err) {
-            throw new BadRequestException(err.response.message || 'Failed to get users');
-        }
+        return await this.userModel.find().exec();
     }
 
     async findById(_id: string): Promise<User> {
@@ -41,11 +36,12 @@ export class UserService {
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        try {
-            return await this.userModel.findOne({ email }).exec()
-        } catch (err) {
-            throw new BadRequestException(err.response.message || 'Failed to get user with email');
+        const user = await this.userModel.findOne({ email }).exec()
+        if (!user) {
+            throw new BadRequestException(`Failed to get user with email ${email}`);
         }
+        return user
+        
     }
 
     async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
@@ -56,17 +52,18 @@ export class UserService {
                 { new: true }
             ).exec();
             if (!updatedUser) {
-                throw new NotFoundException(`Unable to update: User with ID "${id}" not found.`);
+                throw new NotFoundException(`User with ID "${id}" not found`);
             }
-
             return updatedUser;
-
         } catch (err) {
             throw new BadRequestException(err.response.message || 'Failed to update user');
         }
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} user`
+    async remove(id: string): Promise<void>{
+        const deletedUser = await this.userModel.findByIdAndDelete(id).exec()
+        if (!deletedUser) {
+            throw new NotFoundException(`User with ID "${id}" not found`);
+        }
     }
 }

@@ -42,7 +42,7 @@ import axios from 'axios'
                     ...(messages
                         ? messages.length > 1
                             ? messages.map((m, i) => ({ name: `Retorno: ${i + 1}`, value: m.toString(), inline: false }))
-                            : [{ name: 'Retorno:', value: messages.toString(), inline: false }]
+                            : [{ name: 'Retorno:', value: "```" + messages.toString() +"```", inline: false }]
                         : []),
                     ],
                     footer: {
