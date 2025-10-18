@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, BadRequestException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from './dto/create-users.dto'
 import { UpdateUserDto } from './dto/update-users.dto'
@@ -10,14 +10,18 @@ import { User, UserDocument } from './schema/users.schema'
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-    async create(data: Partial<User>): Promise<User> {
+    async create(data: CreateUserDto): Promise<User> {
         try {
+            const existingUser = await this.findOne(data.email)
+            if(existingUser) throw new BadRequestException('Email already exists')
+            if(data.password !== data.confirmPassword) throw new BadRequestException('Passwords do not match')
+
+            
             const user = new this.userModel(data);
-            console.log(user)
             return await user.save();
         } catch (err){
-            console.error(err)
-            throw new Error('Failed to create user');
+            console.error(err.response.message || 'Failed to create user')
+            throw new BadRequestException(err.response.message || 'Failed to create user');
         }
     }
 
@@ -25,8 +29,8 @@ export class UserService {
         return await this.userModel.find().exec();
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} user`
+    async findOne(email: string): Promise<User | null> {
+        return await this.userModel.findOne({ email }).exec()
     }
 
     update(id: number, updateUserDto: UpdateUserDto) {
