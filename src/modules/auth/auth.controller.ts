@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { LoginDto } from './dto/login.dto'
+import { SignInDto } from './dto/signin.dto'
 
 
 @Controller('auth')
@@ -8,8 +8,8 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
 
-    @Post('login')
-    async validateUser(@Body() LoginDto: LoginDto){
-        return await this.authService.login(LoginDto)
+    @Post('signin')
+    async validateUser(@Body() signInDto: SignInDto){
+        return await this.authService.login(signInDto)
     }
 }
