@@ -10,11 +10,12 @@ import { User, UserDocument } from './schema/users.schema'
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-    async create(data: CreateUserDto): Promise<User> {
+    async create(data: CreateUserDto): Promise<Omit<User, 'password'>> {
         try {
             if(data.password !== data.confirmPassword) throw new BadRequestException('Passwords do not match')
-            const user = new this.userModel(data).save()
-            return await user
+            const user = await new this.userModel(data).save()
+            const { password, ...result } = user.toObject()
+            return result
         } catch (err) {
             if (err.code === 11000) {
                 throw new ConflictException(`The email '${data.email}' is already in use`)
