@@ -35,7 +35,7 @@ export class UserService {
         return user
     }
 
-    async findByEmail(email: string): Promise<User | null> {
+    async findByEmail(email: string): Promise<UserDocument | null> {
         const user = await this.userModel.findOne({ email }).exec()
         if (!user) {
             throw new BadRequestException(`Failed to get user with email ${email}`)
