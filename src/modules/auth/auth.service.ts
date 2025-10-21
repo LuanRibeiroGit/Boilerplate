@@ -20,13 +20,18 @@ export class AuthService {
         if(!passwordWatch) throw new UnauthorizedException('Invalid credentials')
         const { password, ...result } = user.toObject()
 
-        const payload = {
-                sub: user.id
-            }
-        console.log(payload)
-        const accessKey = await this.jwtService.signAsync(payload)
-
         
-        return { access_token: accessKey }
+        return { access_token: await this.createAccessToken(user.id) }
+    }
+
+    async createAccessToken (user: string){
+        const payload = {
+                sub: user
+            }
+        const accessKey = await this.jwtService.signAsync(payload, {
+            secret: process.env.ACCESS_KEY,
+            expiresIn: '60s',
+        })
+        return accessKey
     }
 }

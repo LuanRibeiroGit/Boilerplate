@@ -14,8 +14,8 @@ import { AuthGuard } from './guard/auth.guard';
         inject: [ConfigService],
         useFactory: (config: ConfigService) => ({
           global: true,
-          secret: config.get<string>('ACCESS_KEY'),
-          signOptions: { expiresIn: '60s' },
+          // secret: config.get<string>('ACCESS_KEY'),
+          // signOptions: { expiresIn: '60s' },
         }),
       }),
     ],
