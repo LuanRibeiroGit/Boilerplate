@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 export type UserDocument = User & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
   name: string;
@@ -16,8 +16,6 @@ export class User {
   @Prop({ required: true})
   password: string;
 
-  @Prop({ default: Date.now })
-  createdAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

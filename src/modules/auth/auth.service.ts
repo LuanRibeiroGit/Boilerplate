@@ -29,18 +29,18 @@ export class AuthService {
         return { access_token: accessToken, refresh_token: refreshToken }
     }
 
-    async createAccessToken (userId: string){
+    async createAccessToken (userId: string):Promise<string>{
         const payload = {
             sub: userId
         }
         const accessKey = await this.jwtService.signAsync(payload, {
             secret: process.env.ACCESS_KEY,
-            expiresIn: '60s',
+            expiresIn: '2h',
         })
         return accessKey
     }
 
-    async createRefreshToken (userId: string){
+    async createRefreshToken (userId: string):Promise<string>{
         const payload = {
             sub: userId
         }
@@ -49,11 +49,11 @@ export class AuthService {
             expiresIn: '7d',
         })
 
-        const create = await new this.refreshTokenModel({userId: userId, token: refreshKey}).save()
+        await new this.refreshTokenModel({userId: userId, token: refreshKey}).save()
         return refreshKey
     }
 
-    async validateRefreshToken(token: string, res: FastifyReply){
+    async validateRefreshToken(token: string, res: FastifyReply):Promise<{ access_token: string }>{
         const refreshStored = await this.refreshTokenModel.findOne({ token })
         if(!refreshStored)throw new UnauthorizedException('Invalid Token')
 
