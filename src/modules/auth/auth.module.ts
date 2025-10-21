@@ -9,14 +9,8 @@ import { AuthGuard } from './guard/auth.guard';
 @Module({
   imports: [
       forwardRef(() => UserModule),
-      JwtModule.registerAsync({
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => ({
-          global: true,
-          // secret: config.get<string>('ACCESS_KEY'),
-          // signOptions: { expiresIn: '60s' },
-        }),
+      JwtModule.register({
+        global: true,
       }),
     ],
   controllers: [AuthController],

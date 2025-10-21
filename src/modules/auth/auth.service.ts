@@ -18,20 +18,33 @@ export class AuthService {
         if(!user) throw new BadRequestException(`Failed to get user with email ${params.email}`)
         const passwordWatch = await bcrypt.compare(params.password, user.password)
         if(!passwordWatch) throw new UnauthorizedException('Invalid credentials')
-        const { password, ...result } = user.toObject()
-
         
-        return { access_token: await this.createAccessToken(user.id) }
+        const refreshToken = await this.createRefreshToken(user.id)
+        const accessToken = await this.createAccessToken(user.id)
+        
+        return { access_token: accessToken }
     }
 
-    async createAccessToken (user: string){
+    async createAccessToken (userId: string){
         const payload = {
-                sub: user
-            }
+            sub: userId
+        }
         const accessKey = await this.jwtService.signAsync(payload, {
             secret: process.env.ACCESS_KEY,
             expiresIn: '60s',
         })
         return accessKey
+    }
+
+    async createRefreshToken (userId: string){
+        const payload = {
+            sub: userId
+        }
+        const refreshKey = await this.jwtService.signAsync(payload, {
+            secret: process.env.REFRESH_KEY,
+            expiresIn: '60s',
+        })
+
+        return refreshKey
     }
 }
