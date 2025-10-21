@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose'
+import type { FastifyReply } from 'fastify'
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,6 @@ export class AuthService {
     ) {}
     
     async login (params: SignInDto): Promise<{access_token: string, refresh_token: string}>{
-        console.log(params)
         const user = await this.userService.findByEmail(params.email)
         if(!user) throw new BadRequestException(`Failed to get user with email ${params.email}`)
         const passwordWatch = await bcrypt.compare(params.password, user.password)
@@ -46,11 +46,25 @@ export class AuthService {
         }
         const refreshKey = await this.jwtService.signAsync(payload, {
             secret: process.env.REFRESH_KEY,
-            expiresIn: '60s',
+            expiresIn: '7d',
         })
 
         const create = await new this.refreshTokenModel({userId: userId, token: refreshKey}).save()
-        console.log(create)
         return refreshKey
+    }
+
+    async validateRefreshToken(token: string, res: FastifyReply){
+        const refreshStored = await this.refreshTokenModel.findOne({ token })
+        if(!refreshStored)throw new UnauthorizedException('Invalid Token')
+
+        try {
+            const payload = await this.jwtService.verifyAsync(refreshStored.token, { secret: process.env.REFRESH_KEY })
+            const newAccessToken = await this.createAccessToken(payload.sub)
+            return { access_token: newAccessToken }
+        } catch {
+            await this.refreshTokenModel.deleteOne({ token })
+            res.clearCookie('refresh_token', { path: '/' })
+            throw new UnauthorizedException('Token is expired');
+        }
     }
 }

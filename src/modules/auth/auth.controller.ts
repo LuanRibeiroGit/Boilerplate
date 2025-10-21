@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Res, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common'
-import type { FastifyReply } from 'fastify'
+import { Controller, Get, Post, Body, Res, Req, Patch, Param, Delete, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common'
+import type { FastifyReply, FastifyRequest } from 'fastify'
 import { AuthService } from './auth.service'
 import { SignInDto } from './dto/signin.dto'
 
@@ -20,7 +20,15 @@ export class AuthController {
             path: '/',
             maxAge: 7 * 24 * 60 * 60, // 7 dias
         });
-
+        console.log(refresh_token)
         return { access_token };
+    }
+
+    @Get('generate-access-token')
+    async generateAcessToken (@Req() req: FastifyRequest, @Res({ passthrough: true }) res: FastifyReply) {
+        const token = req.cookies['refresh_token'];
+        if (!token) throw new UnauthorizedException('Token is required')
+        const newToken = await this.authService.validateRefreshToken(token, res)
+        return newToken
     }
 }
