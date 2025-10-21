@@ -25,15 +25,16 @@ export class UserService {
     }
 
     async findAll(): Promise<User[]> {
-        return await this.userModel.find().exec()
+        return await this.userModel.find().select('-password').exec()
     }
 
-    async findById(_id: string): Promise<User> {
+    async findById(_id: string): Promise<Omit<User, 'password'>> {
         const user = await this.userModel.findById(_id).exec()
         if (!user) {
             throw new NotFoundException(`Failed to get user by id ${_id}`)
         }
-        return user
+        const { password, ...result } = user.toObject()
+        return result
     }
 
     async findByEmail(email: string): Promise<UserDocument | null> {
@@ -46,16 +47,21 @@ export class UserService {
     }
 
     async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-        const updatedUser = await this.userModel.findByIdAndUpdate(
-            id,
-            updateUserDto,
-            { new: true }
-        ).exec()
-        if (!updatedUser) {
-            throw new NotFoundException(`User with ID "${id}" not found`)
+        try {
+            const updatedUser = await this.userModel.findByIdAndUpdate(
+                id,
+                updateUserDto,
+                { new: true }
+            ).exec()
+            if (!updatedUser) {
+                throw new NotFoundException(`User with ID "${id}" not found`)
+            }
+            
+            return updatedUser
+
+        }catch {
+            throw new BadRequestException(`Email já cadastrado`)
         }
-        
-        return updatedUser
     }
 
     async remove(id: string): Promise<void>{
