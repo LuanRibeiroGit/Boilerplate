@@ -3,8 +3,9 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { ValidationPipe } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
-import { HttpExceptionFilter } from './common/filters/http-exception.filter'
+import fastifyCookie from '@fastify/cookie'
 import { config } from 'dotenv'
+
 
 config()
 
@@ -19,6 +20,10 @@ async function bootstrap() {
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
+    })
+    
+    await app.register(fastifyCookie as any, {
+        secret: process.env.COOKIE_SECRET ,
     })
 
     app.useGlobalPipes(
