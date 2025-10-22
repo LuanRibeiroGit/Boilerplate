@@ -5,20 +5,25 @@ import axios from 'axios'
     export class DiscordService {
         private readonly logger = new Logger(DiscordService.name)
         private readonly webhookUrl = {
-            '/users/register': process.env.DISCORD_WEBHOOK_BARBER_REGISTER,
+            'POST:/users': process.env.DISCORD_WEBHOOK_REGISTER,
+            'GET:/users': process.env.DISCORD_WEBHOOK_USER,
+            'DELETE:/users': process.env.DISCORD_WEBHOOK_DELETE_USER,
+            'PATCH:/users': process.env.DISCORD_WEBHOOK_PATCH_USER,
+            'POST:/auth': process.env.DISCORD_WEBHOOK_SIGNIN,
             outhers: process.env.DISCORD_WEBHOOK_OUTHERS_UTILS
             
-            // DISCORD_WEBHOOK_CLIENT_REGISTER,
-            // DISCORD_WEBHOOK_SHARED_LOGIN,
         }
 
-        async sendEmbed(embed: any, url: string){
+        async sendEmbed(embed: any, url: string, method: string){
             if (!this.webhookUrl) {
                 this.logger.error('Webhook do Discord não configurado.')
                 return
             }
             try {
-                await axios.post(this.webhookUrl[url] || this.webhookUrl.outhers, {
+                const parts = url.split('/')
+                const key = `${method}:/${parts[1]}`
+                console.log(key)
+                await axios.post(this.webhookUrl[key] || this.webhookUrl.outhers, {
                     embeds: [embed],
                 })
             } catch (err) {
@@ -28,8 +33,6 @@ import axios from 'axios'
 
         async createEmbed(method: string, url: string, status: number, body: any, message: any){
             const messages = Array.isArray(message) ? message : [message]
-            console.log(messages)
-
             const embed = {
                 title: '📡 Nova requisição recebida',
                 color: status >= 200 && status < 300 ? 0x00ff00 : 0xff0000,
@@ -56,6 +59,6 @@ import axios from 'axios'
                 timestamp: new Date().toISOString(),
             }
             
-            await this.sendEmbed(embed, url)
+            await this.sendEmbed(embed, url, method)
         }
     }
