@@ -17,7 +17,7 @@ export class AuthService {
         private refreshTokenModel: Model<RefreshTokenDocument>
     ) {}
     
-    async login (params: SignInDto): Promise<{access_token: string, refresh_token: string}>{
+    async signIn (params: SignInDto): Promise<{access_token: string, refresh_token: string}>{
         const user = await this.userService.findByEmail(params.email)
         if(!user) throw new BadRequestException(`Failed to get user with email ${params.email}`)
         const passwordWatch = await bcrypt.compare(params.password, user.password)
@@ -53,7 +53,7 @@ export class AuthService {
         return refreshKey
     }
 
-    async validateRefreshToken(token: string, res: FastifyReply):Promise<{ access_token: string }>{
+    async newAccessToken(token: string, res: FastifyReply):Promise<{ access_token: string }>{
         const refreshStored = await this.refreshTokenModel.findOne({ token })
         if(!refreshStored)throw new UnauthorizedException('Invalid Token')
 

@@ -7,12 +7,11 @@ import { SignInDto } from './dto/signin.dto'
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
-
-
+    
     @HttpCode(HttpStatus.OK)
     @Post('signin')
     async validateUser(@Body() signInDto: SignInDto, @Res({ passthrough: true }) res: FastifyReply) {
-        const { access_token, refresh_token } = await this.authService.login(signInDto);
+        const { access_token, refresh_token } = await this.authService.signIn(signInDto);
         res.setCookie('refresh_token', refresh_token, {
             httpOnly: true,
             secure: true,
@@ -24,11 +23,11 @@ export class AuthController {
         return { access_token };
     }
 
-    @Get('generate-access-token')
-    async generateAcessToken (@Req() req: FastifyRequest, @Res({ passthrough: true }) res: FastifyReply) {
+    @Get('new-access-token')
+    async newAcessToken (@Req() req: FastifyRequest, @Res({ passthrough: true }) res: FastifyReply) {
         const token = req.cookies['refresh_token'];
         if (!token) throw new UnauthorizedException('Token is required')
-        const newToken = await this.authService.validateRefreshToken(token, res)
+        const newToken = await this.authService.newAccessToken(token, res)
         return newToken
     }
 }
