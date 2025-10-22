@@ -7,7 +7,7 @@ import { SignInDto } from './dto/signin.dto'
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
-    
+
     @HttpCode(HttpStatus.OK)
     @Post('signin')
     async validateUser(@Body() signInDto: SignInDto, @Res({ passthrough: true }) res: FastifyReply) {
@@ -21,6 +21,11 @@ export class AuthController {
         });
         console.log(refresh_token)
         return { access_token };
+    }
+
+    @Get('logout/:id')
+    async logOut(@Param('id') userId: string, @Res({ passthrough: true }) res: FastifyReply){
+        await this.authService.logOut(userId, res)
     }
 
     @Get('new-access-token')

@@ -1,4 +1,4 @@
-import { Inject, Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { SignInDto } from './dto/signin.dto';
 import { UserService } from '../users/users.service';
 import { RefreshTokenDocument, RefreshToken } from './schema/auth.schema'
@@ -27,6 +27,14 @@ export class AuthService {
         const accessToken = await this.createAccessToken(user.id)
         
         return { access_token: accessToken, refresh_token: refreshToken }
+    }
+
+    async logOut(userId: string, res: FastifyReply){
+        const logout = await this.refreshTokenModel.deleteMany({ userId }).exec()
+        if (!logout) {
+            throw new NotFoundException(`User with ID "${userId}" not found`)
+        }
+        res.clearCookie('refresh_token', { path: '/' })
     }
 
     async createAccessToken (userId: string):Promise<string>{
