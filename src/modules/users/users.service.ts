@@ -48,8 +48,6 @@ export class UserService {
 
     async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
         try {
-            console.log(id)
-            console.log(updateUserDto)
             const updatedUser = await this.userModel.findByIdAndUpdate(
                 id,
                 updateUserDto,
