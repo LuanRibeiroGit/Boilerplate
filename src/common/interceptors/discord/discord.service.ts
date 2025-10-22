@@ -27,7 +27,8 @@ import axios from 'axios'
         }
 
         async createEmbed(method: string, url: string, status: number, body: any, message: any){
-            const messages = Array.isArray(message) ? message : [message];
+            const messages = Array.isArray(message) ? message : [message]
+            console.log(messages)
 
             const embed = {
                 title: '📡 Nova requisição recebida',
@@ -40,10 +41,11 @@ import axios from 'axios'
                     ...(body?.password ? [{name: '**🔒 password:**', value: ("```"+ '******' +"```"), inline: false}] : []),
                     ...(body?.name ? [{name: '**🧑 name:**', value: ("```"+ body.name +"```"), inline: false}] : []),
                     ...(body?.phone ? [{name: '**phone:**', value: ("```"+ body.phone +"```"), inline: true}] : []),
-                    ...(messages
-                        ? messages.length > 1
+                    ...(messages[0]
+                        ? messages[0].length > 1 && messages[0].length <= 4
                             ? messages.map((m, i) => ({ name: `Retorno: ${i + 1}`, value: m.toString(), inline: false }))
-                            : [{ name: 'Retorno:', value: "```" + messages.toString() +"```", inline: false }]
+                            : messages[0].length > 4 && Array.isArray(messages[0])? [{ name: 'Retorno:', value: "```" + 'Very big value' +"```", inline: false }]
+                            : [{ name: 'Retorno:', value: "```" + JSON.stringify(messages[0]) +"```", inline: false }]
 
                         : []),
                     ],

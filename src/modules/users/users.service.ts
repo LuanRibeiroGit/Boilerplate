@@ -48,6 +48,8 @@ export class UserService {
 
     async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
         try {
+            console.log(id)
+            console.log(updateUserDto)
             const updatedUser = await this.userModel.findByIdAndUpdate(
                 id,
                 updateUserDto,
@@ -59,8 +61,14 @@ export class UserService {
             
             return updatedUser
 
-        }catch {
-            throw new BadRequestException(`Email já cadastrado`)
+        }catch (err){
+            if ((err as any).code === 11000) {
+            throw new ConflictException(
+                `The email '${updateUserDto.email}' is already in use`
+            );
+        }
+            
+            throw new BadRequestException('User not Found')
         }
     }
 
