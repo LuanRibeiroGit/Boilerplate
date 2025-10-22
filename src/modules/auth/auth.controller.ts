@@ -23,9 +23,9 @@ export class AuthController {
         return { access_token };
     }
 
-    @Get('logout/:id')
-    async logOut(@Param('id') userId: string, @Res({ passthrough: true }) res: FastifyReply){
-        await this.authService.logOut(userId, res)
+    @Get('sigout/:id')
+    async sigOut(@Param('id') userId: string, @Res({ passthrough: true }) res: FastifyReply){
+        await this.authService.sigOut(userId, res)
     }
 
     @Get('new-access-token')

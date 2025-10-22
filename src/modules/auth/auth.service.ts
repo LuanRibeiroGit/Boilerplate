@@ -29,9 +29,9 @@ export class AuthService {
         return { access_token: accessToken, refresh_token: refreshToken }
     }
 
-    async logOut(userId: string, res: FastifyReply){
-        const logout = await this.refreshTokenModel.deleteMany({ userId }).exec()
-        if (!logout) {
+    async sigOut(userId: string, res: FastifyReply){
+        const sigout = await this.refreshTokenModel.deleteMany({ userId }).exec()
+        if (!sigout) {
             throw new NotFoundException(`User with ID "${userId}" not found`)
         }
         res.clearCookie('refresh_token', { path: '/' })
