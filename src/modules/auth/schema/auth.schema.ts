@@ -3,6 +3,7 @@ import { Document } from 'mongoose';
 
 export type RefreshTokenDocument = RefreshToken & Document;
 
+
 @Schema({ timestamps: true })
 export class RefreshToken {
     @Prop({ required: true })
@@ -11,7 +12,7 @@ export class RefreshToken {
     @Prop({ required: true })
     token: string;
 
-    @Prop({ default: Date.now })
+    @Prop({ default: Date.now, index: { expires: '7d' } } )
     expiresAt: Date;
 }
 
