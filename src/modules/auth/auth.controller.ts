@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Res, Req, Patch, Param, Delete, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common'
+import { Controller, Get, Post, Body, Res, Req, Patch, Param, Delete, HttpCode, HttpStatus, UnauthorizedException, UseGuards } from '@nestjs/common'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { AuthService } from './auth.service'
 import { SignInDto } from './dto/signin.dto'
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 
 @Controller('auth')
@@ -23,9 +24,12 @@ export class AuthController {
         return { access_token };
     }
 
-    @Get('sigout/:id')
-    async sigOut(@Param('id') userId: string, @Res({ passthrough: true }) res: FastifyReply){
-        await this.authService.sigOut(userId, res)
+    @UseGuards(AuthGuard)
+    @Get('sigout')
+    async sigOut(@Req() req: FastifyRequest, @Res({ passthrough: true }) res: FastifyReply){
+        const refreshToken = req.cookies['refresh_token']
+        console.log(refreshToken)
+        if (refreshToken) await this.authService.sigOut(refreshToken, res)
     }
 
     @Get('new-access-token')
