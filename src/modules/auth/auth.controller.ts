@@ -25,7 +25,7 @@ export class AuthController {
     }
 
     @UseGuards(AuthGuard)
-    @Get('sigout')
+    @Get('signout')
     async sigOut(@Req() req: FastifyRequest, @Res({ passthrough: true }) res: FastifyReply){
         const refreshToken = req.cookies['refresh_token']
         console.log(refreshToken)
