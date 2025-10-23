@@ -16,7 +16,6 @@ COPY package*.json ./
 RUN npm install --production --quiet --no-optional --no-fund --loglevel=error
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/.env ./
 
 EXPOSE 3000
 CMD ["node", "dist/main"]
